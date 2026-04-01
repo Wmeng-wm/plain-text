@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>医疗金属丝编织丝计算器</title>
+<style>
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Noto Sans CJK SC","Microsoft YaHei",sans-serif;background:#f5f7fb;margin:0;padding:20px;color:#222}
+.wrap{max-width:860px;margin:0 auto}.card{background:#fff;border-radius:16px;padding:20px;box-shadow:0 8px 30px rgba(0,0,0,.08);margin-bottom:18px}
+h1,h2{margin:0 0 14px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}@media (max-width:700px){.grid{grid-template-columns:1fr}}
+label{font-size:14px;font-weight:600;display:block;margin-bottom:6px}input,select,button{width:100%;padding:12px 14px;border:1px solid #d9e0ea;border-radius:12px;font-size:16px;box-sizing:border-box}
+button{background:#1f6feb;color:#fff;border:none;font-weight:700;cursor:pointer}button.secondary{background:#eef3ff;color:#1f3f8f}.muted{color:#666;font-size:13px}.result{font-size:18px;font-weight:700;background:#f7fafc;padding:14px;border-radius:12px}.hidden{display:none}.ok{color:#0a7d31;font-weight:700}.bad{color:#c62828;font-weight:700}.small{font-size:12px}.subline{color:#666;font-size:14px;margin-top:6px;margin-bottom:10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div id="loginCard" class="card">
+    <h1>医疗金属丝编织丝计算器</h1>
+    <p class="subline">由王萌开发｜内部授权使用</p>
+    <p class="muted">请输入授权码后使用。授权信息保存在本机浏览器中。</p>
+    <div class="grid">
+      <div><label>授权码</label><input id="licenseInput" placeholder="请输入授权码，例如 WM-NEIBU-001" /></div>
+      <div style="display:flex;align-items:end;"><button onclick="verifyLicense()">进入系统</button></div>
+    </div>
+    <p id="licenseMsg" class="muted" style="margin-top:12px;"></p>
+    <hr style="margin:18px 0;border:none;border-top:1px solid #eee">
+    <details><summary>管理员说明（部署后可自行修改授权码）</summary><p class="small">打开本文件底部的 <code>LICENSE_DB</code>，即可添加/修改客户授权码与到期时间。</p></details>
+  </div>
+
+  <div id="appCard" class="card hidden">
+    <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap">
+      <div>
+        <h1>医疗金属丝编织丝计算器</h1>
+        <p class="subline">由王萌开发｜内部授权使用</p>
+        <div class="muted">已授权：<span id="activeCode"></span> ｜ 到期：<span id="expiryText"></span></div>
+      </div>
+      <button class="secondary" style="max-width:180px" onclick="logout()">退出授权</button>
+    </div>
+
+    <div class="grid" style="margin-top:16px">
+      <div><label>材质</label><select id="material"><option>304</option><option>316</option><option>Niti</option></select></div>
+      <div><label>丝型</label><select id="wireType" onchange="toggleFields()"><option>圆丝</option><option>扁丝</option></select></div>
+      <div id="roundField"><label>圆丝直径 d（mm）</label><input id="diameter" type="number" step="0.0001" value="0.05" /></div>
+      <div id="flatWidthField" class="hidden"><label>扁丝宽 b（mm）</label><input id="width" type="number" step="0.0001" value="0.05" /></div>
+      <div id="flatThickField" class="hidden"><label>扁丝厚 h（mm）</label><input id="thickness" type="number" step="0.0001" value="0.127" /></div>
+      <div><label>重量（g）</label><input id="weight" type="number" step="0.01" value="1000" /></div>
+      <div><label>股数合一（可选）</label><input id="strands" type="number" step="1" value="1" /></div>
+    </div>
+
+    <div style="margin-top:14px"><button onclick="calculate()">开始计算</button></div>
+
+    <div class="grid" style="margin-top:16px">
+      <div class="result">密度：<span id="densityOut">-</span> g/cm³</div>
+      <div class="result">截面积：<span id="areaOut">-</span> mm²</div>
+      <div class="result">每米重量：<span id="gpmOut">-</span> g/m</div>
+      <div class="result">总米数：<span id="lengthOut">-</span> m</div>
+      <div class="result">股数合一后可用米数：<span id="strandLengthOut">-</span> m</div>
+    </div>
+
+    <div class="card" style="margin-top:18px;background:#fbfcff">
+      <h2>公式说明</h2>
+      <p><b>密度：</b>304 = 7.93；316 = 7.98；Niti = 6.45</p>
+      <p><b>圆丝截面积：</b>A = 0.7854 × d²</p>
+      <p><b>扁丝截面积：</b>A = 宽 × 厚</p>
+      <p><b>每米重量：</b>截面积 × 密度</p>
+      <p><b>总米数：</b>重量 ÷ 每米重量</p>
+    </div>
+  </div>
+</div>
+
+<script>
+const LICENSE_DB = {
+  "WM-NEIBU-001": { customer: "内部版", expiry: "2028-12-31" },
+  "WM-TEST-001": { customer: "测试客户", expiry: "2026-12-31" }
+};
+function todayStr(){const d=new Date();return d.toISOString().slice(0,10);}
+function isExpired(dateStr){ return dateStr < todayStr(); }
+function verifyLicense(){const code=document.getElementById("licenseInput").value.trim();const msg=document.getElementById("licenseMsg");if(!code){msg.innerHTML='<span class="bad">请输入授权码</span>';return;}const info=LICENSE_DB[code];if(!info){msg.innerHTML='<span class="bad">授权码无效</span>';return;}if(isExpired(info.expiry)){msg.innerHTML='<span class="bad">授权码已到期：'+info.expiry+'</span>';return;}const expireAt=new Date();expireAt.setDate(expireAt.getDate()+7);localStorage.setItem("wirecalc_license", JSON.stringify({code, expiryLocal: expireAt.toISOString(), expiryServer: info.expiry}));showApp(code, info.expiry);msg.innerHTML='<span class="ok">授权成功</span>';}
+function showApp(code, expiryServer){document.getElementById("loginCard").classList.add("hidden");document.getElementById("appCard").classList.remove("hidden");document.getElementById("activeCode").textContent=code;document.getElementById("expiryText").textContent=expiryServer;calculate();}
+function checkSavedLicense(){const raw=localStorage.getItem("wirecalc_license");if(!raw) return;try{const data=JSON.parse(raw);if(new Date(data.expiryLocal)>new Date()&&LICENSE_DB[data.code]&&!isExpired(LICENSE_DB[data.code].expiry)){showApp(data.code, LICENSE_DB[data.code].expiry);}}catch(e){}}
+function logout(){localStorage.removeItem("wirecalc_license");location.reload();}
+function toggleFields(){const type=document.getElementById("wireType").value;document.getElementById("roundField").classList.toggle("hidden", type!=="圆丝");document.getElementById("flatWidthField").classList.toggle("hidden", type!=="扁丝");document.getElementById("flatThickField").classList.toggle("hidden", type!=="扁丝");}
+function calculate(){const material=document.getElementById("material").value;const type=document.getElementById("wireType").value;const weight=parseFloat(document.getElementById("weight").value||0);const strands=Math.max(1,parseInt(document.getElementById("strands").value||1));const densityMap={"304":7.93,"316":7.98,"Niti":6.45};const density=densityMap[material];let area=0;if(type==="圆丝"){const d=parseFloat(document.getElementById("diameter").value||0);area=0.7854*d*d;}else{const w=parseFloat(document.getElementById("width").value||0);const h=parseFloat(document.getElementById("thickness").value||0);area=w*h;}const gpm=area*density;const length=gpm>0?weight/gpm:0;const strandLength=length/strands;document.getElementById("densityOut").textContent=density.toFixed(2);document.getElementById("areaOut").textContent=area.toFixed(6);document.getElementById("gpmOut").textContent=gpm.toFixed(6);document.getElementById("lengthOut").textContent=length.toFixed(0);document.getElementById("strandLengthOut").textContent=strandLength.toFixed(0);}
+toggleFields();checkSavedLicense();
+</script>
+
+<div style="text-align:center;margin-top:30px;color:#666;font-size:13px;padding-bottom:20px;">
+  版权所有 © 王萌 ｜ 医疗金属丝编织丝计算器 ｜ 未经授权禁止商用与二次分发
+</div>
+</body>
+</html>
