@@ -25,41 +25,15 @@
     color: var(--text-main);
     line-height: 1.5;
   }
-  .wrap { max-width: 960px; margin: 0 auto; } /* 适当增加最大宽度以适应两列布局 */
-  
-  /* 标题和副标题样式（保留）*/
-  .subline { color: var(--text-muted); font-size: 14px; margin-top: 4px; margin-bottom: 16px; }
-
-  /* 2. 主卡片样式 */
-  .app-card {
+  .wrap { max-width: 860px; margin: 0 auto; }
+  .card {
     background: var(--card-bg);
     border-radius: var(--radius);
-    padding: 20px; /* 适当减少外层内边距 */
+    padding: 28px;
     box-shadow: 0 4px 24px rgba(149, 157, 165, 0.15);
     margin-bottom: 20px;
     border: 1px solid #f1f5f9;
   }
-
-  /* 3. 主网格和子卡片样式 (重要：一行2个) */
-  .app-main-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr; /* 2列 */
-    gap: 16px; /* 块间距 */
-    align-items: flex-start; /* 防止不均匀高度拉伸 */
-  }
-
-  .sub-card {
-    background: #fdfdfd;
-    border-radius: 12px;
-    padding: 20px;
-    border: 1px solid var(--border);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
-  }
-
-  /* 4. 辅助布局类 */
-  .grid-col-span-2 { grid-column: span 2; }
-
-  /* 原有样式保留 */
   h1 { margin: 0 0 8px; font-size: 22px; font-weight: 600; color: #0f172a; }
   h2 { margin: 0 0 16px; font-size: 16px; font-weight: 600; color: #334155; }
   
@@ -88,6 +62,7 @@
   .hidden { display: none !important; }
   .ok { color: var(--success); font-weight: 600; }
   .bad { color: var(--danger); font-weight: 600; }
+  .subline { color: var(--text-muted); font-size: 14px; margin-top: 4px; margin-bottom: 16px; }
   
   /* Tabs */
   .tabs { display: flex; gap: 8px; margin-bottom: 24px; background: #f1f5f9; padding: 6px; border-radius: 12px; }
@@ -117,7 +92,7 @@
 </head>
 <body>
 <div class="wrap">
-  <div id="loginCard" class="card" style="background: var(--card-bg); border-radius: var(--radius); padding: 28px; box-shadow: 0 4px 24px rgba(149, 157, 165, 0.15); margin-bottom: 20px; border: 1px solid #f1f5f9;">
+  <div id="loginCard" class="card">
     <h1>医疗编织丝克数转换器</h1>
     <p class="subline">由王萌开发｜仅内部授权使用</p>
     <p class="muted">请输入授权码后使用。授权信息将安全保存在本机浏览器中。</p>
@@ -140,147 +115,141 @@
     </details>
   </div>
 
-  <div id="appCard" class="app-card hidden">
-    <div style="display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap;margin-bottom:24px; grid-column: span 2;">
+  <div id="appCard" class="card hidden">
+    <div style="display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap;margin-bottom:24px;">
       <div>
         <h1>医疗编织丝克数转换器</h1>
-        <p class="subline" style="margin-bottom: 0;">由王萌开发｜仅内部授权使用</p>
+        <p class="subline" style="margin-top: 4px; margin-bottom: 0;">由王萌开发｜仅内部授权使用</p>
         <div class="muted hidden">当前授权：<span id="activeCode" style="font-weight:600;color:var(--text-main);"></span> &nbsp;|&nbsp; 到期时间：<span id="expiryText"></span></div>
       </div>
       <button class="secondary" style="width:auto; padding:8px 20px; font-size: 14px;" onclick="logout()">退出授权</button>
     </div>
 
-    <div class="tabs grid-col-span-2">
+    <div class="tabs">
       <button id="tabMetalBtn" class="tab-btn active" onclick="switchTab('metal')">金属丝计算</button>
       <button id="tabFiberBtn" class="tab-btn" onclick="switchTab('fiber')">纤维丝计算</button>
     </div>
 
-    <div class="app-main-grid">
-      <div class="sub-card">
-        <h2 style="margin: 0 0 16px; font-size: 16px; font-weight: 600; color: #334155;">工艺参数输入</h2>
-        
-        <div id="metalSection" class="grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
-          <div>
-            <label>材质</label>
-            <select id="material" onchange="calculate()">
-              <option value="304">304 不锈钢</option>
-              <option value="316">316L 不锈钢</option>
-              <option value="Niti">镍钛合金 (Niti)</option>
-              <option value="W">钨丝 (W)</option>
-              <option value="Pt">铂金 (Pt)</option>
-            </select>
-          </div>
-          <div>
-            <label>丝型</label>
-            <select id="wireType" onchange="toggleFields(); calculate();">
-              <option value="圆丝">圆丝</option>
-              <option value="扁丝">扁丝</option>
-            </select>
-          </div>
-          <div id="roundField">
-            <label>圆丝直径 d (mm)</label>
-            <input id="diameter" type="number" step="0.001" value="0.05" oninput="calculate()" />
-          </div>
-          <div id="flatWidthField" class="hidden">
-            <label>扁丝宽 b (mm)</label>
-            <input id="width" type="number" step="0.001" value="0.05" oninput="calculate()" />
-          </div>
-          <div id="flatThickField" class="hidden">
-            <label>扁丝厚 h (mm)</label>
-            <input id="thickness" type="number" step="0.001" value="0.127" oninput="calculate()" />
-          </div>
-          <div>
-            <label>丝材总重量 (g)</label>
-            <input id="metalWeight" type="number" step="0.1" value="1000" oninput="calculate()" />
-          </div>
-          <div>
-            <label>分丝/合股数</label>
-            <input id="metalStrands" type="number" step="1" value="1" min="1" oninput="calculate()" />
-          </div>
-        </div>
-
-        <div id="fiberSection" class="grid hidden" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
-          <div>
-            <label>纤维材质 (参考)</label>
-            <select id="fiberMaterial">
-              <option>超高分子量聚乙烯 (UHMWPE)</option>
-              <option>氨纶 (Spandex)</option>
-              <option>涤纶 (PET)</option>
-              <option>尼龙 (Nylon)</option>
-              <option>其他</option>
-            </select>
-          </div>
-          <div>
-            <label>规格单位</label>
-            <select id="fiberUnit" onchange="calculate()">
-              <option value="D">Denier (D / 旦尼尔)</option>
-              <option value="Tex">Tex (特克斯)</option>
-              <option value="dtex">dtex (分特)</option>
-            </select>
-          </div>
-          <div>
-            <label>规格数值</label>
-            <input id="fiberValue" type="number" step="1" value="100" oninput="calculate()" />
-          </div>
-          <div>
-            <label>卷轴总重量 (g)</label>
-            <input id="fiberWeight" type="number" step="0.1" value="1000" oninput="calculate()" />
-          </div>
-          <div>
-            <label>分丝/合股数</label>
-            <input id="fiberStrands" type="number" step="1" value="1" min="1" oninput="calculate()" />
-          </div>
-        </div>
+    <div id="metalSection" class="grid">
+      <div>
+        <label>材质</label>
+        <select id="material" onchange="calculate()">
+          <option value="304">304 不锈钢</option>
+          <option value="316">316L 不锈钢</option>
+          <option value="Niti">镍钛合金 (Niti)</option>
+          <option value="W">钨丝 (W)</option>
+          <option value="Pt">铂金 (Pt)</option>
+        </select>
       </div>
+      <div>
+        <label>丝型</label>
+        <select id="wireType" onchange="toggleFields(); calculate();">
+          <option value="圆丝">圆丝</option>
+          <option value="扁丝">扁丝</option>
+        </select>
+      </div>
+      <div id="roundField">
+        <label>圆丝直径 d (mm)</label>
+        <input id="diameter" type="number" step="0.001" value="0.05" oninput="calculate()" />
+      </div>
+      <div id="flatWidthField" class="hidden">
+        <label>扁丝宽 b (mm)</label>
+        <input id="width" type="number" step="0.001" value="0.05" oninput="calculate()" />
+      </div>
+      <div id="flatThickField" class="hidden">
+        <label>扁丝厚 h (mm)</label>
+        <input id="thickness" type="number" step="0.001" value="0.127" oninput="calculate()" />
+      </div>
+      <div>
+        <label>丝材总重量 (g)</label>
+        <input id="metalWeight" type="number" step="0.1" value="1000" oninput="calculate()" />
+      </div>
+      <div>
+        <label>分丝/合股数</label>
+        <input id="metalStrands" type="number" step="1" value="1" min="1" oninput="calculate()" />
+      </div>
+    </div>
 
-      <div class="sub-card">
-        <h2 style="margin: 0 0 16px; font-size: 16px; font-weight: 600; color: #334155;">计算结果展示</h2>
-        <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px;">
-          <div id="densityCard" class="result-box">
-            <div class="result-label" id="propLabel">密度 (g/cm³)</div>
-            <div class="result-val" id="densityOut">-</div>
-          </div>
-          <div id="areaCard" class="result-box">
-            <div class="result-label" id="areaLabel">截面积 (mm²)</div>
-            <div class="result-val" id="areaOut">-</div>
-          </div>
-          <div class="result-box">
-            <div class="result-label">每米重量 (g/m)</div>
-            <div class="result-val" id="gpmOut">-</div>
-          </div>
-          <div class="result-box" style="background:#eff6ff; border-color:#bfdbfe;">
-            <div class="result-label">总长度 (m)</div>
-            <div class="result-val" id="lengthOut">-</div>
-          </div>
-          <div class="result-box" style="background:#f0fdf4; border-color:#bbf7d0;">
-            <div class="result-label">单股可用长度 (m)</div>
-            <div class="result-val" id="strandLengthOut">-</div>
-          </div>
+    <div id="fiberSection" class="grid hidden">
+      <div>
+        <label>纤维材质 (参考)</label>
+        <select id="fiberMaterial">
+          <option>超高分子量聚乙烯 (UHMWPE)</option>
+          <option>氨纶 (Spandex)</option>
+          <option>涤纶 (PET)</option>
+          <option>尼龙 (Nylon)</option>
+          <option>其他</option>
+        </select>
+      </div>
+      <div>
+        <label>规格单位</label>
+        <select id="fiberUnit" onchange="calculate()">
+          <option value="D">Denier (D / 旦尼尔)</option>
+          <option value="Tex">Tex (特克斯)</option>
+          <option value="dtex">dtex (分特)</option>
+        </select>
+      </div>
+      <div>
+        <label>规格数值</label>
+        <input id="fiberValue" type="number" step="1" value="100" oninput="calculate()" />
+      </div>
+      <div>
+        <label>卷轴总重量 (g)</label>
+        <input id="fiberWeight" type="number" step="0.1" value="1000" oninput="calculate()" />
+      </div>
+      <div>
+        <label>分丝/合股数</label>
+        <input id="fiberStrands" type="number" step="1" value="1" min="1" oninput="calculate()" />
+      </div>
+    </div>
+
+    <div style="margin-top: 24px;">
+      <h2>计算结果</h2>
+      <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
+        <div id="densityCard" class="result-box">
+          <div class="result-label" id="propLabel">密度 (g/cm³)</div>
+          <div class="result-val" id="densityOut">-</div>
+        </div>
+        <div id="areaCard" class="result-box">
+          <div class="result-label" id="areaLabel">截面积 (mm²)</div>
+          <div class="result-val" id="areaOut">-</div>
+        </div>
+        <div class="result-box">
+          <div class="result-label">每米重量 (g/m)</div>
+          <div class="result-val" id="gpmOut">-</div>
+        </div>
+        <div class="result-box" style="background:#eff6ff; border-color:#bfdbfe;">
+          <div class="result-label">总长度 (m)</div>
+          <div class="result-val" id="lengthOut">-</div>
+        </div>
+        <div class="result-box" style="background:#f0fdf4; border-color:#bbf7d0;">
+          <div class="result-label">单股可用长度 (m)</div>
+          <div class="result-val" id="strandLengthOut">-</div>
         </div>
       </div>
+    </div>
 
-      <div class="sub-card grid-col-span-2">
-        <h2 style="margin: 0 0 16px; font-size: 16px; font-weight: 600; color: #334155;">运算基准说明</h2>
-      </div>
-
-      <div class="sub-card">
-        <h3 style="font-size:14px; margin:0 0 10px; color:#334155;">【金属丝】</h3>
-        <ul class="formula-list">
-          <li><b>参考密度：</b>304=7.93 | 316=7.98 | Niti=6.45 | W=19.3 | Pt=21.45</li>
-          <li><b>圆丝截面积：</b>A = π × (d/2)²</li>
-          <li><b>扁丝截面积：</b>A = 宽(b) × 厚(h)</li>
-          <li><b>每米克重：</b>截面积 × 密度</li>
-        </ul>
-      </div>
-
-      <div class="sub-card">
-        <h3 style="font-size:14px; margin:0 0 10px; color:#334155;">【纤维丝】</h3>
-        <ul class="formula-list">
-          <li><b>D (Denier)：</b>9000米长纤维的克数。</li>
-          <li><b>Tex (特克斯)：</b>1000米长纤维的克数。</li>
-          <li><b>dtex (分特)：</b>10000米长纤维的克数。</li>
-          <li><b>总长度：</b>总重量 ÷ 每米克重</li>
-        </ul>
+    <div style="margin-top:24px; padding: 20px; background: #f8fafc; border-radius: 12px;">
+      <h2>运算基准说明</h2>
+      <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div>
+          <h3 style="font-size:14px; margin:0 0 10px; color:#334155;">【金属丝】</h3>
+          <ul class="formula-list">
+            <li><b>参考密度：</b>304=7.93 | 316=7.98 | Niti=6.45 | W=19.3 | Pt=21.45</li>
+            <li><b>圆丝截面积：</b>A = π × (d/2)²</li>
+            <li><b>扁丝截面积：</b>A = 宽(b) × 厚(h)</li>
+            <li><b>每米克重：</b>截面积 × 密度</li>
+          </ul>
+        </div>
+        <div>
+          <h3 style="font-size:14px; margin:0 0 10px; color:#334155;">【纤维丝】</h3>
+          <ul class="formula-list">
+            <li><b>D (Denier)：</b>9000米长纤维的克数。</li>
+            <li><b>Tex (特克斯)：</b>1000米长纤维的克数。</li>
+            <li><b>dtex (分特)：</b>10000米长纤维的克数。</li>
+            <li><b>总长度：</b>总长度 = 总重量 ÷ 每米克重</li>
+          </ul>
+        </div>
       </div>
     </div>
   </div>
