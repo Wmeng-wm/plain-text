@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>医疗编织工艺参数计算器</title>
+<title>医疗编织丝克数转换器</title>
 <style>
   :root {
     --primary: #2563eb;
@@ -93,8 +93,8 @@
 <body>
 <div class="wrap">
   <div id="loginCard" class="card">
-    <h1>医疗编织工艺参数计算器</h1>
-    <p class="subline">内部授权使用</p>
+    <h1>医疗编织丝克数转换器</h1>
+    <p class="subline">由王萌开发｜仅内部授权使用</p>
     <p class="muted">请输入授权码后使用。授权信息将安全保存在本机浏览器中。</p>
     <div class="grid" style="margin-top:20px;">
       <div>
@@ -118,8 +118,9 @@
   <div id="appCard" class="card hidden">
     <div style="display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap;margin-bottom:24px;">
       <div>
-        <h1>工艺参数计算器</h1>
-        <div class="muted">当前授权：<span id="activeCode" style="font-weight:600;color:var(--text-main);"></span> &nbsp;|&nbsp; 到期时间：<span id="expiryText"></span></div>
+        <h1>医疗编织丝克数转换器</h1>
+        <p class="subline" style="margin-bottom: 0;">由王萌开发｜仅内部授权使用</p>
+        <div class="muted hidden">当前授权：<span id="activeCode" style="font-weight:600;color:var(--text-main);"></span> &nbsp;|&nbsp; 到期时间：<span id="expiryText"></span></div>
       </div>
       <button class="secondary" style="width:auto; padding:8px 20px; font-size: 14px;" onclick="logout()">退出授权</button>
     </div>
@@ -230,8 +231,8 @@
 
     <div style="margin-top:24px; padding: 20px; background: #f8fafc; border-radius: 12px;">
       <h2>运算基准说明</h2>
-      <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 20px;">
-        <div>
+      <div style="display: flex; flex-wrap: wrap; gap: 24px;">
+        <div style="flex: 1; min-width: 250px;">
           <h3 style="font-size:14px; margin:0 0 10px; color:#334155;">【金属丝】</h3>
           <ul class="formula-list">
             <li><b>参考密度：</b>304=7.93 | 316=7.98 | Niti=6.45 | W=19.3 | Pt=21.45</li>
@@ -240,7 +241,7 @@
             <li><b>每米克重：</b>截面积 × 密度</li>
           </ul>
         </div>
-        <div>
+        <div style="flex: 1; min-width: 250px;">
           <h3 style="font-size:14px; margin:0 0 10px; color:#334155;">【纤维丝】</h3>
           <ul class="formula-list">
             <li><b>D (Denier)：</b>9000米长纤维的克数。</li>
@@ -255,14 +256,14 @@
 </div>
 
 <div class="footer-text">
-  版权所有 © 王萌 ｜ 医疗金属丝与纤维丝工艺计算器 ｜ 未经授权禁止商用与二次分发
+  版权所有 © 王萌 ｜ 医疗编织丝克数转换器 ｜ 未经授权禁止商用与二次分发
 </div>
 
 <script>
 // --- 授权数据库验证逻辑 ---
 const LICENSE_DB = {
-  "WM-NEIBU": { customer: "内部版", expiry: "2028-12-31" },
-  "WM-VIP-001": { customer: "测试客户", expiry: "2026-12-31" }
+  "WM-NEIBU-001": { customer: "内部版", expiry: "2028-12-31" },
+  "WM-TEST-001": { customer: "测试客户", expiry: "2026-12-31" }
 };
 
 function todayStr(){ const d=new Date(); return d.toISOString().slice(0,10); }
