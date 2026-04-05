@@ -94,12 +94,12 @@
 <div class="wrap">
   <div id="loginCard" class="card">
     <h1>医疗编织丝克数转换器</h1>
-    <p class="subline">由王萌开发｜仅内部授权使用</p>
+    <p class="subline">WM开发｜仅内部授权使用</p>
     <p class="muted">请输入授权码后使用。授权信息将安全保存在本机浏览器中。</p>
     <div class="grid" style="margin-top:20px;">
       <div>
         <label>授权码</label>
-        <input id="licenseInput" placeholder="请输入授权码，例如 WM-NEIBU-001" autocomplete="off" />
+        <input id="licenseInput" placeholder="请输入授权码，" autocomplete="off" />
       </div>
       <div style="display:flex;align-items:end;">
         <button onclick="verifyLicense()">进入系统</button>
@@ -119,7 +119,7 @@
     <div style="display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap;margin-bottom:24px;">
       <div>
         <h1>医疗编织丝克数转换器</h1>
-        <p class="subline" style="margin-top: 4px; margin-bottom: 0;">由王萌开发｜仅内部授权使用</p>
+        <p class="subline" style="margin-top: 4px; margin-bottom: 0;">由WM开发｜仅内部授权使用</p>
         <div class="muted hidden">当前授权：<span id="activeCode" style="font-weight:600;color:var(--text-main);"></span> &nbsp;|&nbsp; 到期时间：<span id="expiryText"></span></div>
       </div>
       <button class="secondary" style="width:auto; padding:8px 20px; font-size: 14px;" onclick="logout()">退出授权</button>
@@ -262,8 +262,8 @@
 <script>
 // --- 授权数据库验证逻辑 ---
 const LICENSE_DB = {
-  "WM-NEIBU-001": { customer: "内部版", expiry: "2028-12-31" },
-  "WM-TEST-001": { customer: "测试客户", expiry: "2026-12-31" }
+  "WM-NEIBU": { customer: "内部版", expiry: "2028-12-31" },
+  "VIP-001": { customer: "测试客户", expiry: "2026-12-31" }
 };
 
 function todayStr(){ const d=new Date(); return d.toISOString().slice(0,10); }
